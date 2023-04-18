@@ -3,7 +3,9 @@ package ru.smak.net
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ru.smak.net.Communicator
+import java.awt.Color
 import java.net.Socket
+import java.util.Random
 
 /**
  * Организация работы с подключенным клиентом на стороне сервера
@@ -20,11 +22,15 @@ class ConnectedClient(
 
     private val cmn = Communicator(socket)
 
+    private val r = Random(System.currentTimeMillis())
     var name: String? = null
         private set(value) {
             value?.let { vl ->
                 if (list.find { it.name == value } == null) {
                     field = vl
+                    clr= Color(r.nextInt(100)+100,r.nextInt(100)+100,r.nextInt(100)+100)
+                    val str = clr?.rgb.toString()
+                    println(str)
                     sendToAllConnectedClients({ if (it == this) "NAMEOK" else "NEW" },
                         { if (it != this) vl else "" }
                     )
@@ -53,9 +59,9 @@ class ConnectedClient(
             }
         }
     }
-
+    var clr :Color?=Color.BLACK
     fun parse(data: String) {
-        if (name != null) sendToAllConnectedClients({ "MSG" }, { "${if (it == this) "Вы" else name}: $data" })
+        if (name != null) sendToAllConnectedClients({ if (it==this)"URMSG" else "MSG:${clr?.rgb}" }, { "${if (it == this) "" else name+':'} $data" })
         else name = data
     }
 

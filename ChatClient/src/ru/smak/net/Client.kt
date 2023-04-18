@@ -1,6 +1,9 @@
 package ru.smak.net
 
+import ConsoleUI
+import GraphicUI
 import kotlinx.coroutines.*
+import java.io.Console
 import java.net.Socket
 
 class Client(
@@ -22,41 +25,10 @@ class Client(
                 parse(it)
             }
         }
-
-        launch {
-            while (isActive) {
-                val s = readlnOrNull() ?: ""
-                cmn.sendData(s)
-            }
-        }
     }
+        val ui = GraphicUI(cmn::sendData)
+            //val ui = ConsoleUI(cmn::sendData)
+    var parse =ui::parse
 
-    private fun parse(data: String) {
-        data.split(":", limit = 2).let {
-            when (it[0]) {
-                "INTR" -> {
-                    print("Представьте себя: ")
-                }
 
-                "REINTR" -> {
-                    print("Имя занято, выберите другое: ")
-                }
-
-                "NAMEOK" -> {
-                    println("Вы успешно вошли в чат")
-                }
-
-                "MSG" -> {
-                    println(it[1])
-                }
-
-                "NEW" -> {
-                    println("Пользователь ${it[1]} вошёл в чат")
-                }
-                "EXIT" -> {
-                    println("Пользователь ${it[1]} покинул чат")
-                }
-            }
-        }
-    }
 }

@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/ChatClient/ChatClient.iml" filepath="$PROJECT_DIR$/ChatClient/ChatClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/ChatIO/ChatIO.iml" filepath="$PROJECT_DIR$/ChatIO/ChatIO.iml" />
       <module fileurl="file://$PROJECT_DIR$/ChatServer/ChatServer.iml" filepath="$PROJECT_DIR$/ChatServer/ChatServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ChatUI/ChatUI.iml" filepath="$PROJECT_DIR$/ChatUI/ChatUI.iml" />
     </modules>
   </component>
 </project>
