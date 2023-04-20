@@ -1,5 +1,6 @@
 package ru.smak.net
 
+import BDOper
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ru.smak.net.Communicator
@@ -29,13 +30,13 @@ class ConnectedClient(
                 if (list.find { it.name == value } == null) {
                     field = vl
                     clr= Color(r.nextInt(100)+100,r.nextInt(100)+100,r.nextInt(100)+100)
-                    val str = clr?.rgb.toString()
-                    println(str)
+                    println("Пользователь $vl успешон вошёл")
                     sendToAllConnectedClients({ if (it == this) "NAMEOK" else "NEW" },
                         { if (it != this) vl else "" }
                     )
-                } else cmn.sendData("REINTR:")
-            } ?: cmn.sendData("REINTR:")
+                    cmn.sendData("USRS"+writeList(_list))
+                } else cmn.sendData("REINTR:Пользователь уже авторизован")
+            } ?: cmn.sendData("REINTR:Не указан логин")
         }
 
     init {
@@ -59,13 +60,57 @@ class ConnectedClient(
             }
         }
     }
+    val bd = BDOper()
     var clr :Color?=Color.BLACK
     fun parse(data: String) {
+        /*
         if (name != null) sendToAllConnectedClients({ if (it==this)"URMSG" else "MSG:${clr?.rgb}" }, { "${if (it == this) "" else name+':'} $data" })
         else name = data
+        */
+
+        val str = data.split(":",limit=2)
+        when (str[0]){
+            "MSG"->{
+                if (name != null) sendToAllConnectedClients({ if (it==this)"URMSG" else "MSG:${clr?.rgb}" }, { "${if (it == this) "" else name+':'}${str[1]}" })
+                else cmn.sendData("INTR:")
+            }
+            "REG"->{
+                if(name!=null) {
+                    cmn.sendData("SYS:Вы уже авторизованы")
+                    return
+                }
+                val logps = str[1].split(":",limit=2)
+                println("isFree"+bd.isUserFree(logps[0]))
+                if(bd.isUserFree(logps[0])){
+                    bd.addUser(logps[0],logps[1])
+                    cmn.sendData("REGOK:Регистрация прошла успешно")
+                    println("Зарегистрирован пользователь ${logps[0]}")
+                }
+                else cmn.sendData("REREG:Логин занят")
+            }
+            "LOG"->{
+                if(name!=null) {
+                    cmn.sendData("SYS:Вы уже авторизованы")
+                    return
+                }
+                val logps = str[1].split(":",limit=2)
+                if(bd.CheckUser(logps[0],logps[1])){
+                    name = logps[0]
+                }else cmn.sendData("REINTR:Неверный логин или пароль")
+            }
+            else ->{
+                cmn.sendData("SYS:Неизвестная команда")
+            }
+        }
     }
 
-
+    fun writeList(list: MutableList<ConnectedClient>): String {
+        val s = java.lang.StringBuilder()
+        list.forEach {
+            s.append(":"+it.name)
+        }
+        return s.toString()
+    }
     private fun sendToAllConnectedClients(cmd: (ConnectedClient) -> String, data: (ConnectedClient) -> String) {
         _list.forEach {
             it.name?.let {_->

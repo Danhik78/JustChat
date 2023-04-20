@@ -5,15 +5,16 @@ class ConsoleUI(sendFunction: (String) -> Unit) : ChatUI {
         data.split(":", limit = 2).let {
             when (it[0]) {
                 "INTR" -> {
-                    print("Представьте себя: ")
+                    println("Авторизуйтесь:")
                 }
 
                 "REINTR" -> {
-                    print("Имя занято, выберите другое: ")
+                    print("Неудалось авторизоваться:"+it[1])
                 }
 
                 "NAMEOK" -> {
                     println("Вы успешно вошли в чат")
+                    cmd="MSG:"
                 }
                 "URMSG" ->{
                     println("Вы:"+it[1])
@@ -21,7 +22,9 @@ class ConsoleUI(sendFunction: (String) -> Unit) : ChatUI {
                 "MSG" -> {
                     println(it[1].split(":", limit = 2)[1])
                 }
-
+                "SYS"->{
+                    println("Сообщение от сервера: "+it[1])
+                }
                 "NEW" -> {
                     println("Пользователь ${it[1]} вошёл в чат")
                 }
@@ -29,14 +32,18 @@ class ConsoleUI(sendFunction: (String) -> Unit) : ChatUI {
                 "EXIT" -> {
                     println("Пользователь ${it[1]} покинул чат")
                 }
+                else ->{
+                    println(data)
+                }
             }
         }
     }
+    var cmd =""
     init{
         CoroutineScope(Dispatchers.IO + Job()).launch {
             while (true) {
                 val s = readlnOrNull() ?: ""
-                sendFunction(s)
+                sendFunction(cmd+s)
             }
         }
     }

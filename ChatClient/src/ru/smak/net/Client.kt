@@ -1,5 +1,6 @@
 package ru.smak.net
 
+import ChatUI
 import ConsoleUI
 import GraphicUI
 import kotlinx.coroutines.*
@@ -13,10 +14,12 @@ class Client(
     private val s: Socket
     private val cmn: Communicator
     private val mainCoroutineScope = CoroutineScope(Dispatchers.IO + Job())
+    val ui:ChatUI
 
     init {
         s = Socket(host, port)
         cmn = Communicator(s)
+        ui = GraphicUI(cmn::sendData)
     }
 
     fun start() = mainCoroutineScope.launch {
@@ -26,7 +29,7 @@ class Client(
             }
         }
     }
-        val ui = GraphicUI(cmn::sendData)
+            //val ui = GraphicUI(cmn::sendData)
             //val ui = ConsoleUI(cmn::sendData)
     var parse =ui::parse
 
